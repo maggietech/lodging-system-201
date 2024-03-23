@@ -1,244 +1,85 @@
 export const idlFactory = ({ IDL }) => {
   return IDL.Service({
-    'acceptLoanRequest' : IDL.Func(
+    'createReservation' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Text, IDL.Nat64, IDL.Nat64],
+        [IDL.Text],
+        [],
+      ),
+    'getHouseDetails' : IDL.Func(
         [IDL.Text],
         [
           IDL.Variant({
             'Ok' : IDL.Record({
               'id' : IDL.Text,
-              'status' : IDL.Variant({
-                'Active' : IDL.Text,
-                'Defaulted' : IDL.Text,
-                'Completed' : IDL.Text,
-              }),
-              'duration' : IDL.Nat64,
-              'dueDate' : IDL.Nat64,
-              'borrower' : IDL.Principal,
-              'creationDate' : IDL.Nat64,
-              'interestRate' : IDL.Nat64,
-              'lender' : IDL.Opt(IDL.Principal),
-              'amount' : IDL.Nat64,
+              'updated_at' : IDL.Opt(IDL.Nat64),
+              'owner' : IDL.Principal,
+              'name' : IDL.Text,
+              'created_date' : IDL.Nat64,
             }),
-            'Err' : IDL.Variant({
-              'PaymentFailed' : IDL.Text,
-              'InvalidPayload' : IDL.Text,
-              'NotFound' : IDL.Text,
-              'PaymentCompleted' : IDL.Text,
-            }),
+            'Err' : IDL.Text,
           }),
-        ],
-        [],
-      ),
-    'accumulateInterest' : IDL.Func([], [IDL.Vec(IDL.Text)], []),
-    'automateLoanRepayment' : IDL.Func([], [IDL.Vec(IDL.Text)], []),
-    'checkForDefault' : IDL.Func([], [IDL.Vec(IDL.Text)], []),
-    'createLoanRequest' : IDL.Func(
-        [
-          IDL.Record({
-            'duration' : IDL.Nat64,
-            'interestRate' : IDL.Nat64,
-            'amount' : IDL.Nat64,
-          }),
-        ],
-        [
-          IDL.Variant({
-            'Ok' : IDL.Text,
-            'Err' : IDL.Variant({
-              'PaymentFailed' : IDL.Text,
-              'InvalidPayload' : IDL.Text,
-              'NotFound' : IDL.Text,
-              'PaymentCompleted' : IDL.Text,
-            }),
-          }),
-        ],
-        [],
-      ),
-    'getLoanRequests' : IDL.Func(
-        [],
-        [
-          IDL.Vec(
-            IDL.Record({
-              'duration' : IDL.Nat64,
-              'interestRate' : IDL.Nat64,
-              'amount' : IDL.Nat64,
-            })
-          ),
         ],
         ['query'],
       ),
-    'getLoanStatus' : IDL.Func(
+    'getPaymentDetails' : IDL.Func(
         [IDL.Text],
         [
           IDL.Variant({
-            'Ok' : IDL.Variant({
-              'Active' : IDL.Text,
-              'Defaulted' : IDL.Text,
-              'Completed' : IDL.Text,
-            }),
-            'Err' : IDL.Variant({
-              'PaymentFailed' : IDL.Text,
-              'InvalidPayload' : IDL.Text,
-              'NotFound' : IDL.Text,
-              'PaymentCompleted' : IDL.Text,
-            }),
+            'Ok' : IDL.Record({ 'msg' : IDL.Text, 'amount' : IDL.Nat64 }),
+            'Err' : IDL.Text,
           }),
         ],
         ['query'],
       ),
-    'getLoans' : IDL.Func(
-        [],
-        [
-          IDL.Vec(
-            IDL.Record({
-              'id' : IDL.Text,
-              'status' : IDL.Variant({
-                'Active' : IDL.Text,
-                'Defaulted' : IDL.Text,
-                'Completed' : IDL.Text,
-              }),
-              'duration' : IDL.Nat64,
-              'dueDate' : IDL.Nat64,
-              'borrower' : IDL.Principal,
-              'creationDate' : IDL.Nat64,
-              'interestRate' : IDL.Nat64,
-              'lender' : IDL.Opt(IDL.Principal),
-              'amount' : IDL.Nat64,
-            })
-          ),
-        ],
-        ['query'],
-      ),
-    'getUserLoanHistory' : IDL.Func(
-        [IDL.Principal],
-        [
-          IDL.Vec(
-            IDL.Record({
-              'id' : IDL.Text,
-              'status' : IDL.Variant({
-                'Active' : IDL.Text,
-                'Defaulted' : IDL.Text,
-                'Completed' : IDL.Text,
-              }),
-              'duration' : IDL.Nat64,
-              'dueDate' : IDL.Nat64,
-              'borrower' : IDL.Principal,
-              'creationDate' : IDL.Nat64,
-              'interestRate' : IDL.Nat64,
-              'lender' : IDL.Opt(IDL.Principal),
-              'amount' : IDL.Nat64,
-            })
-          ),
-        ],
-        ['query'],
-      ),
-    'makeRepayment' : IDL.Func(
-        [IDL.Text, IDL.Nat64],
-        [
-          IDL.Variant({
-            'Ok' : IDL.Text,
-            'Err' : IDL.Variant({
-              'PaymentFailed' : IDL.Text,
-              'InvalidPayload' : IDL.Text,
-              'NotFound' : IDL.Text,
-              'PaymentCompleted' : IDL.Text,
-            }),
-          }),
-        ],
-        [],
-      ),
-    'modifyLoanTerms' : IDL.Func(
-        [
-          IDL.Text,
-          IDL.Record({
-            'duration' : IDL.Nat64,
-            'interestRate' : IDL.Nat64,
-            'amount' : IDL.Nat64,
-          }),
-        ],
+    'getReservationDetails' : IDL.Func(
+        [IDL.Text],
         [
           IDL.Variant({
             'Ok' : IDL.Record({
               'id' : IDL.Text,
-              'status' : IDL.Variant({
-                'Active' : IDL.Text,
-                'Defaulted' : IDL.Text,
-                'Completed' : IDL.Text,
-              }),
-              'duration' : IDL.Nat64,
-              'dueDate' : IDL.Nat64,
-              'borrower' : IDL.Principal,
-              'creationDate' : IDL.Nat64,
-              'interestRate' : IDL.Nat64,
-              'lender' : IDL.Opt(IDL.Principal),
-              'amount' : IDL.Nat64,
+              'room_id' : IDL.Text,
+              'check_out_date' : IDL.Nat64,
+              'check_in_date' : IDL.Nat64,
+              'created_date' : IDL.Nat64,
+              'guest_id' : IDL.Text,
             }),
-            'Err' : IDL.Variant({
-              'PaymentFailed' : IDL.Text,
-              'InvalidPayload' : IDL.Text,
-              'NotFound' : IDL.Text,
-              'PaymentCompleted' : IDL.Text,
-            }),
+            'Err' : IDL.Text,
           }),
         ],
-        [],
+        ['query'],
       ),
-    'registerUser' : IDL.Func(
+    'getRoomDetails' : IDL.Func(
         [IDL.Text],
-        [
-          IDL.Variant({
-            'Ok' : IDL.Text,
-            'Err' : IDL.Variant({
-              'PaymentFailed' : IDL.Text,
-              'InvalidPayload' : IDL.Text,
-              'NotFound' : IDL.Text,
-              'PaymentCompleted' : IDL.Text,
-            }),
-          }),
-        ],
-        [],
-      ),
-    'requestLoanExtension' : IDL.Func(
-        [IDL.Text, IDL.Nat64],
         [
           IDL.Variant({
             'Ok' : IDL.Record({
               'id' : IDL.Text,
-              'status' : IDL.Variant({
-                'Active' : IDL.Text,
-                'Defaulted' : IDL.Text,
-                'Completed' : IDL.Text,
-              }),
-              'duration' : IDL.Nat64,
-              'dueDate' : IDL.Nat64,
-              'borrower' : IDL.Principal,
-              'creationDate' : IDL.Nat64,
-              'interestRate' : IDL.Nat64,
-              'lender' : IDL.Opt(IDL.Principal),
-              'amount' : IDL.Nat64,
+              'is_booked' : IDL.Bool,
+              'updated_at' : IDL.Opt(IDL.Nat64),
+              'house_id' : IDL.Text,
+              'room_number' : IDL.Text,
+              'price' : IDL.Text,
+              'created_date' : IDL.Nat64,
             }),
-            'Err' : IDL.Variant({
-              'PaymentFailed' : IDL.Text,
-              'InvalidPayload' : IDL.Text,
-              'NotFound' : IDL.Text,
-              'PaymentCompleted' : IDL.Text,
-            }),
+            'Err' : IDL.Text,
           }),
         ],
+        ['query'],
+      ),
+    'processPayment' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Text],
+        [IDL.Variant({ 'Ok' : IDL.Text, 'Err' : IDL.Text })],
         [],
       ),
-    'saveFunds' : IDL.Func(
-        [IDL.Nat64],
-        [
-          IDL.Variant({
-            'Ok' : IDL.Text,
-            'Err' : IDL.Variant({
-              'PaymentFailed' : IDL.Text,
-              'InvalidPayload' : IDL.Text,
-              'NotFound' : IDL.Text,
-              'PaymentCompleted' : IDL.Text,
-            }),
-          }),
-        ],
+    'registerGuest' : IDL.Func([IDL.Text, IDL.Text], [IDL.Text], []),
+    'registerHouse' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Principal],
+        [IDL.Text],
+        [],
+      ),
+    'registerRoom' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Text, IDL.Bool, IDL.Text],
+        [IDL.Text],
         [],
       ),
   });
