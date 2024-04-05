@@ -1,11 +1,50 @@
 export const idlFactory = ({ IDL }) => {
   return IDL.Service({
-    'createReservation' : IDL.Func(
-        [IDL.Text, IDL.Text, IDL.Text, IDL.Nat64, IDL.Nat64],
+    'addGuest' : IDL.Func([IDL.Record({ 'name' : IDL.Text })], [IDL.Text], []),
+    'addHouse' : IDL.Func(
+        [IDL.Record({ 'owner' : IDL.Principal, 'name' : IDL.Text })],
         [IDL.Text],
         [],
       ),
-    'getHouseDetails' : IDL.Func(
+    'addRoom' : IDL.Func(
+        [
+          IDL.Record({
+            'is_booked' : IDL.Bool,
+            'house_id' : IDL.Text,
+            'room_number' : IDL.Text,
+            'price' : IDL.Text,
+          }),
+        ],
+        [IDL.Text],
+        [],
+      ),
+    'createReservation' : IDL.Func(
+        [
+          IDL.Record({
+            'room_id' : IDL.Text,
+            'check_out_date' : IDL.Text,
+            'check_in_date' : IDL.Text,
+            'guest_id' : IDL.Text,
+          }),
+        ],
+        [IDL.Text],
+        [],
+      ),
+    'getGuest' : IDL.Func(
+        [IDL.Text],
+        [
+          IDL.Variant({
+            'Ok' : IDL.Record({
+              'id' : IDL.Text,
+              'name' : IDL.Text,
+              'created_date' : IDL.Nat64,
+            }),
+            'Err' : IDL.Variant({ 'NotFound' : IDL.Text }),
+          }),
+        ],
+        ['query'],
+      ),
+    'getHouse' : IDL.Func(
         [IDL.Text],
         [
           IDL.Variant({
@@ -16,39 +55,29 @@ export const idlFactory = ({ IDL }) => {
               'name' : IDL.Text,
               'created_date' : IDL.Nat64,
             }),
-            'Err' : IDL.Text,
+            'Err' : IDL.Variant({ 'NotFound' : IDL.Text }),
           }),
         ],
         ['query'],
       ),
-    'getPaymentDetails' : IDL.Func(
-        [IDL.Text],
-        [
-          IDL.Variant({
-            'Ok' : IDL.Record({ 'msg' : IDL.Text, 'amount' : IDL.Nat64 }),
-            'Err' : IDL.Text,
-          }),
-        ],
-        ['query'],
-      ),
-    'getReservationDetails' : IDL.Func(
+    'getReservation' : IDL.Func(
         [IDL.Text],
         [
           IDL.Variant({
             'Ok' : IDL.Record({
               'id' : IDL.Text,
               'room_id' : IDL.Text,
-              'check_out_date' : IDL.Nat64,
-              'check_in_date' : IDL.Nat64,
+              'check_out_date' : IDL.Text,
+              'check_in_date' : IDL.Text,
               'created_date' : IDL.Nat64,
               'guest_id' : IDL.Text,
             }),
-            'Err' : IDL.Text,
+            'Err' : IDL.Variant({ 'NotFound' : IDL.Text }),
           }),
         ],
         ['query'],
       ),
-    'getRoomDetails' : IDL.Func(
+    'getRoom' : IDL.Func(
         [IDL.Text],
         [
           IDL.Variant({
@@ -61,24 +90,61 @@ export const idlFactory = ({ IDL }) => {
               'price' : IDL.Text,
               'created_date' : IDL.Nat64,
             }),
-            'Err' : IDL.Text,
+            'Err' : IDL.Variant({ 'NotFound' : IDL.Text }),
           }),
         ],
         ['query'],
       ),
-    'processPayment' : IDL.Func(
-        [IDL.Text, IDL.Text, IDL.Text],
-        [IDL.Variant({ 'Ok' : IDL.Text, 'Err' : IDL.Text })],
-        [],
-      ),
-    'registerGuest' : IDL.Func([IDL.Text, IDL.Text], [IDL.Text], []),
-    'registerHouse' : IDL.Func(
-        [IDL.Text, IDL.Text, IDL.Principal],
+    'updateGuest' : IDL.Func(
+        [
+          IDL.Record({
+            'id' : IDL.Text,
+            'name' : IDL.Text,
+            'created_date' : IDL.Nat64,
+          }),
+        ],
         [IDL.Text],
         [],
       ),
-    'registerRoom' : IDL.Func(
-        [IDL.Text, IDL.Text, IDL.Text, IDL.Bool, IDL.Text],
+    'updateHouse' : IDL.Func(
+        [
+          IDL.Record({
+            'id' : IDL.Text,
+            'updated_at' : IDL.Opt(IDL.Nat64),
+            'owner' : IDL.Principal,
+            'name' : IDL.Text,
+            'created_date' : IDL.Nat64,
+          }),
+        ],
+        [IDL.Text],
+        [],
+      ),
+    'updateReservation' : IDL.Func(
+        [
+          IDL.Record({
+            'id' : IDL.Text,
+            'room_id' : IDL.Text,
+            'check_out_date' : IDL.Text,
+            'check_in_date' : IDL.Text,
+            'created_date' : IDL.Nat64,
+            'guest_id' : IDL.Text,
+          }),
+        ],
+        [IDL.Text],
+        [],
+      ),
+    'updateRoom' : IDL.Func(
+        [
+          IDL.Record({
+            'id' : IDL.Text,
+            'is_booked' : IDL.Bool,
+            'updated_at' : IDL.Opt(IDL.Nat64),
+            'house_id' : IDL.Text,
+            'room_number' : IDL.Text,
+            'price' : IDL.Text,
+            'created_date' : IDL.Nat64,
+          }),
+        ],
         [IDL.Text],
         [],
       ),

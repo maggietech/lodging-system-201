@@ -7,7 +7,7 @@ import { Row } from "react-bootstrap";
 
 import { NotificationSuccess, NotificationError } from "../utils/Notifications";
 import {
-  getRoomDetails as getRoomList,
+  getRoom as getRoomList,
   registerRoom,
   updateRoom
 } from "../../utils/roomService";
@@ -17,7 +17,7 @@ const Rooms = () => {
   const [loading, setLoading] = useState(false);
 
   // Function to get the list of rooms
-  const getRoomDetails = useCallback(async () => {
+  const getRoom = useCallback(async () => {
     try {
       setLoading(true);
       setRooms(await getRoomList());
@@ -52,7 +52,7 @@ const Rooms = () => {
       setLoading(true);
       data.id = parseInt(data.id, 10);
       updateRoom(data).then((resp) => {
-        getRoomDetails();
+        getRoom();
         toast(<NotificationSuccess text="Room updated successfully." />);
       });
     } catch (error) {
@@ -64,8 +64,8 @@ const Rooms = () => {
   };
 
   useEffect(() => {
-    getRoomDetails();
-  }, [getRoomDetails]);
+    getRoom();
+  }, []);
 
   return (
     <>

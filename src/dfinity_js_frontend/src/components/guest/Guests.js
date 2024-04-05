@@ -7,7 +7,7 @@ import { Row } from "react-bootstrap";
 
 import { NotificationSuccess, NotificationError } from "../utils/Notifications";
 import {
-  getGuestDetails as getGuestList,
+  getGuest as getGuestList,
   registerGuest,
   updateGuest
 } from "../../utils/guestService";
@@ -17,7 +17,7 @@ const Guests = () => {
   const [loading, setLoading] = useState(false);
 
   // Function to get the list of guests
-  const getGuestDetails = useCallback(async () => {
+  const getGuest = useCallback(async () => {
     try {
       setLoading(true);
       setGuests(await getGuestList());
@@ -35,7 +35,7 @@ const Guests = () => {
       const idStr = data.id;
       data.id = parseInt(idStr, 10);
       registerGuest(data).then((resp) => {
-        getGuestDetails();
+        getGuest();
       });
       toast(<NotificationSuccess text="Guest added successfully." />);
     } catch (error) {
@@ -52,7 +52,7 @@ const Guests = () => {
       setLoading(true);
       data.id = parseInt(data.id, 10);
       updateGuest(data).then((resp) => {
-        getGuestDetails();
+        getGuest();
         toast(<NotificationSuccess text="Guest updated successfully." />);
       });
     } catch (error) {
@@ -64,8 +64,8 @@ const Guests = () => {
   };
 
   useEffect(() => {
-    getGuestDetails();
-  }, [getGuestDetails]);
+    getGuest();
+  }, []);
 
   return (
     <>

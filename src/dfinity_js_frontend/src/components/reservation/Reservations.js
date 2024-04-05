@@ -7,7 +7,7 @@ import { Row } from "react-bootstrap";
 
 import { NotificationSuccess, NotificationError } from "../utils/Notifications";
 import {
-  getReservationDetails as getReservationList,
+  getReservation as getReservationList,
   createReservation,
   updateReservation
 } from "../../utils/reservationService";
@@ -17,7 +17,7 @@ const Reservations = () => {
   const [loading, setLoading] = useState(false);
 
   // Function to get the list of reservations
-  const getReservationDetails = useCallback(async () => {
+  const getReservation = useCallback(async () => {
     try {
       setLoading(true);
       setReservations(await getReservationList());
@@ -35,7 +35,7 @@ const Reservations = () => {
       const idStr = data.id;
       data.id = parseInt(idStr, 10);
       createReservation(data).then((resp) => {
-        getReservationDetails();
+        getReservation();
       });
       toast(<NotificationSuccess text="Reservation created successfully." />);
     } catch (error) {
@@ -47,8 +47,8 @@ const Reservations = () => {
   };
 
   useEffect(() => {
-    getReservationDetails();
-  }, [getReservationDetails]);
+    getReservation();
+  }, []);
 
   return (
     <>

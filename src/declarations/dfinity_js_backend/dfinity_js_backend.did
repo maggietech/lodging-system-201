@@ -1,11 +1,14 @@
 service: () -> {
-    createReservation: (text, text, text, nat64, nat64) -> (text);
-    getHouseDetails: (text) -> (variant {Ok:record {id:text; updated_at:opt nat64; owner:principal; name:text; created_date:nat64}; Err:text}) query;
-    getPaymentDetails: (text) -> (variant {Ok:record {msg:text; amount:nat64}; Err:text}) query;
-    getReservationDetails: (text) -> (variant {Ok:record {id:text; room_id:text; check_out_date:nat64; check_in_date:nat64; created_date:nat64; guest_id:text}; Err:text}) query;
-    getRoomDetails: (text) -> (variant {Ok:record {id:text; is_booked:bool; updated_at:opt nat64; house_id:text; room_number:text; price:text; created_date:nat64}; Err:text}) query;
-    processPayment: (text, text, text) -> (variant {Ok:text; Err:text});
-    registerGuest: (text, text) -> (text);
-    registerHouse: (text, text, principal) -> (text);
-    registerRoom: (text, text, text, bool, text) -> (text);
+    addGuest: (record {name:text}) -> (text);
+    addHouse: (record {owner:principal; name:text}) -> (text);
+    addRoom: (record {is_booked:bool; house_id:text; room_number:text; price:text}) -> (text);
+    createReservation: (record {room_id:text; check_out_date:text; check_in_date:text; guest_id:text}) -> (text);
+    getGuest: (text) -> (variant {Ok:record {id:text; name:text; created_date:nat64}; Err:variant {NotFound:text}}) query;
+    getHouse: (text) -> (variant {Ok:record {id:text; updated_at:opt nat64; owner:principal; name:text; created_date:nat64}; Err:variant {NotFound:text}}) query;
+    getReservation: (text) -> (variant {Ok:record {id:text; room_id:text; check_out_date:text; check_in_date:text; created_date:nat64; guest_id:text}; Err:variant {NotFound:text}}) query;
+    getRoom: (text) -> (variant {Ok:record {id:text; is_booked:bool; updated_at:opt nat64; house_id:text; room_number:text; price:text; created_date:nat64}; Err:variant {NotFound:text}}) query;
+    updateGuest: (record {id:text; name:text; created_date:nat64}) -> (text);
+    updateHouse: (record {id:text; updated_at:opt nat64; owner:principal; name:text; created_date:nat64}) -> (text);
+    updateReservation: (record {id:text; room_id:text; check_out_date:text; check_in_date:text; created_date:nat64; guest_id:text}) -> (text);
+    updateRoom: (record {id:text; is_booked:bool; updated_at:opt nat64; house_id:text; room_number:text; price:text; created_date:nat64}) -> (text);
 }

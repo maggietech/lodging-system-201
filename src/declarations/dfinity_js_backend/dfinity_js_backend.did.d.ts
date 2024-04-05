@@ -3,11 +3,36 @@ import type { ActorMethod } from '@dfinity/agent';
 import type { IDL } from '@dfinity/candid';
 
 export interface _SERVICE {
-  'createReservation' : ActorMethod<
-    [string, string, string, bigint, bigint],
+  'addGuest' : ActorMethod<[{ 'name' : string }], string>,
+  'addHouse' : ActorMethod<[{ 'owner' : Principal, 'name' : string }], string>,
+  'addRoom' : ActorMethod<
+    [
+      {
+        'is_booked' : boolean,
+        'house_id' : string,
+        'room_number' : string,
+        'price' : string,
+      },
+    ],
     string
   >,
-  'getHouseDetails' : ActorMethod<
+  'createReservation' : ActorMethod<
+    [
+      {
+        'room_id' : string,
+        'check_out_date' : string,
+        'check_in_date' : string,
+        'guest_id' : string,
+      },
+    ],
+    string
+  >,
+  'getGuest' : ActorMethod<
+    [string],
+    { 'Ok' : { 'id' : string, 'name' : string, 'created_date' : bigint } } |
+      { 'Err' : { 'NotFound' : string } }
+  >,
+  'getHouse' : ActorMethod<
     [string],
     {
         'Ok' : {
@@ -18,28 +43,23 @@ export interface _SERVICE {
           'created_date' : bigint,
         }
       } |
-      { 'Err' : string }
+      { 'Err' : { 'NotFound' : string } }
   >,
-  'getPaymentDetails' : ActorMethod<
-    [string],
-    { 'Ok' : { 'msg' : string, 'amount' : bigint } } |
-      { 'Err' : string }
-  >,
-  'getReservationDetails' : ActorMethod<
+  'getReservation' : ActorMethod<
     [string],
     {
         'Ok' : {
           'id' : string,
           'room_id' : string,
-          'check_out_date' : bigint,
-          'check_in_date' : bigint,
+          'check_out_date' : string,
+          'check_in_date' : string,
           'created_date' : bigint,
           'guest_id' : string,
         }
       } |
-      { 'Err' : string }
+      { 'Err' : { 'NotFound' : string } }
   >,
-  'getRoomDetails' : ActorMethod<
+  'getRoom' : ActorMethod<
     [string],
     {
         'Ok' : {
@@ -52,17 +72,49 @@ export interface _SERVICE {
           'created_date' : bigint,
         }
       } |
-      { 'Err' : string }
+      { 'Err' : { 'NotFound' : string } }
   >,
-  'processPayment' : ActorMethod<
-    [string, string, string],
-    { 'Ok' : string } |
-      { 'Err' : string }
+  'updateGuest' : ActorMethod<
+    [{ 'id' : string, 'name' : string, 'created_date' : bigint }],
+    string
   >,
-  'registerGuest' : ActorMethod<[string, string], string>,
-  'registerHouse' : ActorMethod<[string, string, Principal], string>,
-  'registerRoom' : ActorMethod<
-    [string, string, string, boolean, string],
+  'updateHouse' : ActorMethod<
+    [
+      {
+        'id' : string,
+        'updated_at' : [] | [bigint],
+        'owner' : Principal,
+        'name' : string,
+        'created_date' : bigint,
+      },
+    ],
+    string
+  >,
+  'updateReservation' : ActorMethod<
+    [
+      {
+        'id' : string,
+        'room_id' : string,
+        'check_out_date' : string,
+        'check_in_date' : string,
+        'created_date' : bigint,
+        'guest_id' : string,
+      },
+    ],
+    string
+  >,
+  'updateRoom' : ActorMethod<
+    [
+      {
+        'id' : string,
+        'is_booked' : boolean,
+        'updated_at' : [] | [bigint],
+        'house_id' : string,
+        'room_number' : string,
+        'price' : string,
+        'created_date' : bigint,
+      },
+    ],
     string
   >,
 }

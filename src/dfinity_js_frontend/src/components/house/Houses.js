@@ -7,7 +7,7 @@ import { Row } from "react-bootstrap";
 
 import { NotificationSuccess, NotificationError } from "../utils/Notifications";
 import {
-  getHouseDetails as getHouseList,
+  getHouse as getHouseList,
   registerHouse, updateHouse
 } from "../../utils/houseService";
 
@@ -17,7 +17,7 @@ const Houses = () => {
 
 
   // function to get the list of products
-  const getHouseDetails = useCallback(async () => {
+  const getHouse = useCallback(async () => {
     try {
       setLoading(true);
       setHouses(await getHouseList());
@@ -34,7 +34,7 @@ const Houses = () => {
       const idStr = data.id;
       data.id = parseInt(idStr, 10);
       registerHouse(data).then((resp) => {
-        getHouseDetails();
+        getHouse();
       });
       toast(<NotificationSuccess text="House added successfully." />);
     } catch (error) {
@@ -50,7 +50,7 @@ const Houses = () => {
       setLoading(true);
       data.id = parseInt(data.id, 10);
       updateHouse(data).then((resp) => {
-        getHouseDetails();
+        getHouse();
         toast(<NotificationSuccess text="House added successfully." />);
       });
     } catch (error) {
@@ -62,7 +62,7 @@ const Houses = () => {
   };
 
   useEffect(() => {
-    getHouseDetails();
+    getHouse();
   }, []);
 
   return (

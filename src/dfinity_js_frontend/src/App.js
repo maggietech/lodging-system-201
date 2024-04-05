@@ -4,7 +4,6 @@ import House from "./components/house/Houses";
 import Guest from "./components/guest/Guests";
 import Reservation from "./components/reservation/Reservations";
 import Room from "./components/room/Rooms";
-import Payment from "./components/payment/Payments";
 import "./App.css";
 import coverImg from "./assets/img/sandwich.jpg";
 import { login, logout as destroy } from "./utils/auth";
@@ -25,7 +24,6 @@ const App = function AppWrapper() {
            <Guest />
            <Reservation />
            <Room />
-           <Payment />
           </main>
         </Container>
        ) : (
