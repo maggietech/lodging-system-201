@@ -6,9 +6,9 @@ import { v4 as uuidv4 } from "uuid";
 const House = Record({
     id: text,
     name: text,
-    owner: Principal,
-    created_date: nat64,
-    updated_at: Opt(nat64),
+    address: text,
+    description: text,
+
 });
 
 const Room = Record({
@@ -16,34 +16,35 @@ const Room = Record({
     house_id: text,
     room_number: text,
     is_booked: bool,
-    price: text,
-    created_date: nat64,
-    updated_at: Opt(nat64),
+    capacity: text,
+    price_per_night: text,
 });
 
 const Guest = Record({
     id: text,
     name: text,
-    created_date: nat64,
+   email: text,
+   phone: text,
 });
 
 const Reservation = Record({
     id: text,
+    house_id: text,
     room_id: text,
     guest_id: text,
     check_in_date: text,
     check_out_date: text,
-    created_date: nat64,
 });
 
 const RoomPayload = Record({
     house_id: text,
     room_number: text,
-    is_booked: bool,
-    price: text,
+    capacity: text,
+    price_per_night: text,  
 });
 
 const ReservationPayload = Record({
+    house_id: text,
     room_id: text,
     guest_id: text,
     check_in_date: text,
@@ -52,15 +53,21 @@ const ReservationPayload = Record({
 
 const HousePayload = Record({
     name: text,
-    owner: Principal
+    address: text,
+    description: text,
 });
 
 const GuestPayload = Record({
-    name: text
+    name: text,
+    email: text,
+    phone: text,
 });
 
 const Message = Variant ({
-    NotFound: text
+    NotFound: text,
+    InvalidPayload: text,
+    PaymentFailed: text,
+    PaymentCompleted: text
 })
 // Create instances of StableBTreeMap for each entity type
 const houseStorage = StableBTreeMap(0, text, House);
@@ -71,6 +78,13 @@ const reservationStorage = StableBTreeMap(3, text, Reservation);
 const icpCanister = Ledger(Principal.fromText("ryjl3-tyaaa-aaaaa-aaaba-cai"));
 export default Canister({
  
+    // get Houses
+    getHouses: query([], Vec(House), () => {
+        return houseStorage.values();
+    }),
+
+
+    // get House
     getHouse: query([text], Result(House, Message), (id) => {
         const houseOpt = houseStorage.get(id);
         if ("None" in houseOpt) {
@@ -79,135 +93,228 @@ export default Canister({
         return Ok(houseOpt.Some);
     }),
 
+    // create House
+    createHouse: update([HousePayload], Result(House, Message), (payload) => {
+        if (typeof payload !== "object" || Object.keys(payload).length === 0) {
+            return Err({ InvalidPayload: "invalid payoad" })
+        }
+
+        const house = { id: uuidv4(), ...payload };
+        houseStorage.insert(house.id, house);
+        return Ok(house);
+    }),
+
+    // update house with id
+    updateHouse: update([text, HousePayload], Result(House, Message), (id, payload) => {
+        const houseOpt = houseStorage.get(id);
+        if ("None" in houseOpt) {
+            return Err({ NotFound: `house with id=${id} not found` });
+        }
+
+        const house = houseOpt.Some;
+        houseStorage.insert(house.id, { ...house, ...payload });
+        return Ok(house);
+    }),
+
+    // Search House by name or description
+    searchHouse: query([text], Vec(House), (query) => {
+        return houseStorage.values().filter((house) => {
+            return house.name.includes(query) || house.description.includes(query);
+        });
+    }),
+
+    // get Rooms
+    getRooms: query([], Vec(Room), () => {
+        return roomStorage.values();
+    }),
+
+    // get Room
     getRoom: query([text], Result(Room, Message), (id) => {
         const roomOpt = roomStorage.get(id);
         if ("None" in roomOpt) {
-            return Err({ NotFound: `Room with id=${id} not found` });
+            return Err({ NotFound: `room with id=${id} not found` });
         }
         return Ok(roomOpt.Some);
     }),
 
+    // create Room
+    createRoom: update([RoomPayload], Result(Room, Message), (payload) => {
+        if (typeof payload !== "object" || Object.keys(payload).length === 0) {
+            return Err({ InvalidPayload: "invalid payoad" })
+        }
+
+        const room = { id: uuidv4(), is_booked: false, ...payload };
+        roomStorage.insert(room.id, room);
+        return Ok(room);
+    }),
+
+    // update room with id
+    updateRoom: update([text, RoomPayload], Result(Room, Message), (id, payload) => {
+        const roomOpt = roomStorage.get(id);
+        if ("None" in roomOpt) {
+            return Err({ NotFound: `room with id=${id} not found` });
+        }
+
+        const room = roomOpt.Some;
+        roomStorage.insert(room.id, { ...room, ...payload });
+        return Ok(room);
+    }),
+
+    // get Guests
+    getGuests: query([], Vec(Guest), () => {
+        return guestStorage.values();
+    }),
+
+    // get Guest
     getGuest: query([text], Result(Guest, Message), (id) => {
         const guestOpt = guestStorage.get(id);
         if ("None" in guestOpt) {
-            return Err({ NotFound: `Guest with id=${id} not found` });
+            return Err({ NotFound: `guest with id=${id} not found` });
         }
         return Ok(guestOpt.Some);
     }),
 
+    // create Guest
+    createGuest: update([GuestPayload], Result(Guest, Message), (payload) => {
+        if (typeof payload !== "object" || Object.keys(payload).length === 0) {
+            return Err({ InvalidPayload: "invalid payoad" })
+        }
+
+        const guest = { id: uuidv4(), ...payload };
+        guestStorage.insert(guest.id, guest);
+        return Ok(guest);
+    }),
+
+    // update guest with id
+    updateGuest: update([text, GuestPayload], Result(Guest, Message), (id, payload) => {
+        const guestOpt = guestStorage.get(id);
+        if ("None" in guestOpt) {
+            return Err({ NotFound: `guest with id=${id} not found` });
+        }
+
+        const guest = guestOpt.Some;
+        guestStorage.insert(guest.id, { ...guest, ...payload });
+        return Ok(guest);
+    }),  
+
+    // get Reservations
+    getReservations: query([], Vec(Reservation), () => {
+        return reservationStorage.values();
+    }),
+
+    // get Reservation
     getReservation: query([text], Result(Reservation, Message), (id) => {
         const reservationOpt = reservationStorage.get(id);
         if ("None" in reservationOpt) {
-            return Err({ NotFound: `Reservation with id=${id} not found` });
+            return Err({ NotFound: `reservation with id=${id} not found` });
         }
         return Ok(reservationOpt.Some);
     }),
-    
-    // Update functions
-    addHouse: update([HousePayload], text, (payload) => {
-        const { name, owner } = payload;
-    
-        const id = uuidv4(); // Generate a unique ID for the house
-    
-        const house = {
-            id: id,
-            name: name,
-            owner: owner,
-            created_date: ic.time(),
-            updated_at: None
-        };
-        houseStorage.insert(id, house);
-        return `House added successfully with ID ${id}`;
-    }),
 
-    addRoom: update([RoomPayload], text, (payload) => {
-        const { house_id, room_number, is_booked, price } = payload;
-
-        const id = uuidv4(); // Generate a unique ID for the room
-
-        const room = {
-            id: id,
-            house_id: house_id,
-            room_number: room_number,
-            is_booked: is_booked,
-            price: price,
-            created_date: ic.time(),
-            updated_at: None
-        };
-        roomStorage.insert(id, room);
-        return `Room added successfully with ID ${id}`;
-    }),
-
-    addGuest: update([GuestPayload], text, (payload) => {
-        const { name } = payload;
-
-        const id = uuidv4(); // Generate a unique ID for the guest
-
-        const guest = {
-            id: id,
-            name: name,
-            created_date: ic.time()
-        };
-        guestStorage.insert(id, guest);
-        return `Guest added successfully with ID ${id}`;
-    }),
-
-    createReservation: update([ReservationPayload], text, (payload) => {
-        const { room_id, guest_id, check_in_date, check_out_date } = payload;
-
-        const id = uuidv4(); // Generate a unique ID for the reservation
-
-        const reservation = {
-            id: id,
-            room_id: room_id,
-            guest_id: guest_id,
-            check_in_date: check_in_date,
-            check_out_date: check_out_date,
-            created_date: ic.time()
-        };
-        reservationStorage.insert(id, reservation);
-        return `Reservation created successfully with ID ${id}`;
-    }),
-
-    updateHouse: update([House], text, (updatedHouse) => {
-        const { id } = updatedHouse;
-        const existingHouseOpt = houseStorage.get(id);
-        if ("None" in existingHouseOpt) {
-            return `House with ID ${id} not found`;
+    // create Reservation
+    createReservation: update([ReservationPayload], Result(Reservation, Message), async (payload) => {
+        if (typeof payload !== "object" || Object.keys(payload).length === 0) {
+            return Err({ InvalidPayload: "invalid payoad" })
         }
-        houseStorage.insert(id, updatedHouse);
-        return `House with ID ${id} updated successfully`;
+
+        const roomOpt = roomStorage.get(payload.room_id);
+        if ("None" in roomOpt) {
+            return Err({ NotFound: `room with id=${payload.room_id} not found` });
+        }
+
+        const room = roomOpt.Some;
+        if (room.is_booked) {
+            return Err({ InvalidPayload: `room with id=${payload.room_id} is already booked` });
+        }
+
+        const guestOpt = guestStorage.get(payload.guest_id);
+        if ("None" in guestOpt) {
+            return Err({ NotFound: `guest with id=${payload.guest_id} not found` });
+        }
+
+        const guest = guestOpt.Some;
+
+        const houseOpt = houseStorage.get(payload.house_id);
+        if ("None" in houseOpt) {
+            return Err({ NotFound: `house with id=${payload.house_id} not found` });
+        }
+
+        const house = houseOpt.Some;
+
+        const reservation = { id: uuidv4(), ...payload };
+        reservationStorage.insert(reservation.id, reservation);
+
+        roomStorage.insert(room.id, { ...room, is_booked: true });
+        return Ok(reservation);
     }),
 
-    updateRoom: update([Room], text, (updatedRoom) => {
-        const { id } = updatedRoom;
-        const existingRoomOpt = roomStorage.get(id);
-        if ("None" in existingRoomOpt) {
-            return `Room with ID ${id} not found`;
+    // update reservation with id
+    updateReservation: update([text, ReservationPayload], Result(Reservation, Message), (id, payload) => {
+        const reservationOpt = reservationStorage.get(id);
+        if ("None" in reservationOpt) {
+            return Err({ NotFound: `reservation with id=${id} not found` });
         }
-        roomStorage.insert(id, updatedRoom);
-        return `Room with ID ${id} updated successfully`;
+
+        const reservation = reservationOpt.Some;
+        reservationStorage.insert(reservation.id, { ...reservation, ...payload });
+        return Ok(reservation);
     }),
 
-    updateGuest: update([Guest], text, (updatedGuest) => {
-        const { id } = updatedGuest;
-        const existingGuestOpt = guestStorage.get(id);
-        if ("None" in existingGuestOpt) {
-            return `Guest with ID ${id} not found`;
-        }
-        guestStorage.insert(id, updatedGuest);
-        return `Guest with ID ${id} updated successfully`;
+    // get Reservations by house id
+    getReservationsByHouseId: query([text], Vec(Reservation), (house_id) => {
+        return reservationStorage.values().filter((reservation) => {
+            return reservation.house_id === house_id;
+        });
     }),
 
-    updateReservation: update([Reservation], text, (updatedReservation) => {
-        const { id } = updatedReservation;
-        const existingReservationOpt = reservationStorage.get(id);
-        if ("None" in existingReservationOpt) {
-            return `Reservation with ID ${id} not found`;
-        }
-        reservationStorage.insert(id, updatedReservation);
-        return `Reservation with ID ${id} updated successfully`;
-    })
+    // get Reservations by guest id
+    getReservationsByGuestId: query([text], Vec(Reservation), (guest_id) => {
+        return reservationStorage.values().filter((reservation) => {
+            return reservation.guest_id === guest_id;
+        });
+    }),
+
+    // get Reservations by room id
+    getReservationsByRoomId: query([text], Vec(Reservation), (room_id) => {
+        return reservationStorage.values().filter((reservation) => {
+            return reservation.room_id === room_id;
+        });
+    }),
+
+    // get Reservations by check in date
+    getReservationsByCheckInDate: query([text], Vec(Reservation), (check_in_date) => {
+        return reservationStorage.values().filter((reservation) => {
+            return reservation.check_in_date === check_in_date;
+        });
+    }),
+
+    // get Reservations by check out date
+    getReservationsByCheckOutDate: query([text], Vec(Reservation), (check_out_date) => {
+        return reservationStorage.values().filter((reservation) => {
+            return reservation.check_out_date === check_out_date;
+        });
+    }),
+
+
+    // get Reservations by house id and check in date
+    getReservationsByHouseIdAndCheckInDate: query([text, text], Vec(Reservation), (house_id, check_in_date) => {
+        return reservationStorage.values().filter((reservation) => {
+            return reservation.house_id === house_id && reservation.check_in_date === check_in_date;
+        });
+    }),
+
+    // get Reservations by house id and check out date
+    getReservationsByHouseIdAndCheckOutDate: query([text, text], Vec(Reservation), (house_id, check_out_date) => {
+        return reservationStorage.values().filter((reservation) => {
+            return reservation.house_id === house_id && reservation.check_out_date === check_out_date;
+        });
+    }),
+
+
+
+
+ 
+ 
 });
 
 // A workaround to make the uuid package work with Azle

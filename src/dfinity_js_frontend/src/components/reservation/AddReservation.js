@@ -3,12 +3,14 @@ import PropTypes from "prop-types";
 import { Button, Modal, Form, FloatingLabel } from "react-bootstrap";
 
 const AddReservation = ({ save }) => {
-  const [roomId, setRoomId] = useState("");
-  const [guestId, setGuestId] = useState("");
-  const [checkInDate, setCheckInDate] = useState("");
-  const [checkOutDate, setCheckOutDate] = useState("");
 
-  const isFormFilled = () => roomId && guestId && checkInDate && checkOutDate;
+  const [house_id, setHouseId] = useState("");
+  const [room_id, setRoomId] = useState("");
+  const [guest_id, setGuestId] = useState("");
+  const [check_in_date, setCheckInDate] = useState("");
+  const [check_out_date, setCheckOutDate] = useState("");
+
+  const isFormFilled = () => house_id && room_id && guest_id && check_in_date && check_out_date;
 
   const [show, setShow] = useState(false);
 
@@ -29,50 +31,47 @@ const AddReservation = ({ save }) => {
         </Modal.Header>
         <Form>
           <Modal.Body>
-            <FloatingLabel controlId="inputRoomId" label="Room ID" className="mb-3">
+            <FloatingLabel controlId="house_id" label="House ID">
               <Form.Control
                 type="text"
-                placeholder="Room ID"
-                onChange={(e) => {
-                  setRoomId(e.target.value);
-                }}
+                placeholder="Enter house ID"
+                value={house_id}
+                onChange={(e) => setHouseId(e.target.value)}
               />
             </FloatingLabel>
-            <FloatingLabel controlId="inputGuestId" label="Guest ID" className="mb-3">
+            <FloatingLabel controlId="room_id" label="Room ID">
               <Form.Control
                 type="text"
-                placeholder="Guest ID"
-                onChange={(e) => {
-                  setGuestId(e.target.value);
-                }}
+                placeholder="Enter room ID"
+                value={room_id}
+                onChange={(e) => setRoomId(e.target.value)}
               />
             </FloatingLabel>
-            <FloatingLabel
-              controlId="inputCheckInDate"
-              label="Check-in Date"
-              className="mb-3"
-            >
+            <FloatingLabel controlId="guest_id" label="Guest ID">
               <Form.Control
-                type="text" // Assuming checkInDate is a string
-                placeholder="Check-in Date"
-                onChange={(e) => {
-                  setCheckInDate(e.target.value);
-                }}
+                type="text"
+                placeholder="Enter guest ID"
+                value={guest_id}
+                onChange={(e) => setGuestId(e.target.value)}
               />
             </FloatingLabel>
-            <FloatingLabel
-              controlId="inputCheckOutDate"
-              label="Check-out Date"
-              className="mb-3"
-            >
+            <FloatingLabel controlId="check_in_date" label="Check-in Date">
               <Form.Control
-                type="text" // Assuming checkOutDate is a string
-                placeholder="Check-out Date"
-                onChange={(e) => {
-                  setCheckOutDate(e.target.value);
-                }}
+                type="date"
+                placeholder="Enter check-in date"
+                value={check_in_date}
+                onChange={(e) => setCheckInDate(e.target.value)}
               />
             </FloatingLabel>
+            <FloatingLabel controlId="check_out_date" label="Check-out Date">
+              <Form.Control
+                type="date"
+                placeholder="Enter check-out date"
+                value={check_out_date}
+                onChange={(e) => setCheckOutDate(e.target.value)}
+              />
+            </FloatingLabel>
+
           </Modal.Body>
         </Form>
         <Modal.Footer>
@@ -84,10 +83,11 @@ const AddReservation = ({ save }) => {
             disabled={!isFormFilled()}
             onClick={() => {
               save({
-                room_id: roomId,
-                guest_id: guestId,
-                check_in_date: checkInDate, // Assuming checkInDate is a string
-                check_out_date: checkOutDate, // Assuming checkOutDate is a string
+                house_id,
+                room_id,
+                guest_id,
+                check_in_date,
+                check_out_date,
               });
               handleClose();
             }}
@@ -100,8 +100,6 @@ const AddReservation = ({ save }) => {
   );
 };
 
-AddReservation.propTypes = {
-  save: PropTypes.func.isRequired,
-};
+
 
 export default AddReservation;

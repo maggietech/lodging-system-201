@@ -3,11 +3,13 @@ import PropTypes from "prop-types";
 import { Button, Modal, Form, FloatingLabel } from "react-bootstrap";
 
 const AddHouse = ({ save }) => {
-  const [name, setName] = useState("");
-  const [owner, setOwner] = useState("");
-  const [createdDate, setCreatedDate] = useState("");
 
-  const isFormFilled = () => name && owner && createdDate;
+  const [name, setName] = useState("");
+  const [address, setAddress] = useState("");
+  const [description, setDescription] = useState("");
+  
+
+  const isFormFilled = () => name && address && description;
 
   const [show, setShow] = useState(false);
 
@@ -28,35 +30,28 @@ const AddHouse = ({ save }) => {
         </Modal.Header>
         <Form>
           <Modal.Body>
-            <FloatingLabel controlId="inputName" label="Name" className="mb-3">
+            <FloatingLabel controlId="name" label="Name">
               <Form.Control
                 type="text"
-                placeholder="Name"
-                onChange={(e) => {
-                  setName(e.target.value);
-                }}
+                placeholder="Enter house name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
               />
             </FloatingLabel>
-            <FloatingLabel controlId="inputOwner" label="Owner" className="mb-3">
+            <FloatingLabel controlId="address" label="Address">
               <Form.Control
                 type="text"
-                placeholder="Owner"
-                onChange={(e) => {
-                  setOwner(e.target.value);
-                }}
+                placeholder="Enter house address"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
               />
             </FloatingLabel>
-            <FloatingLabel
-              controlId="inputCreatedDate"
-              label="Created Date"
-              className="mb-3"
-            >
+            <FloatingLabel controlId="description" label="Description">
               <Form.Control
-                type="text" // Assuming createdDate is a string
-                placeholder="Created Date"
-                onChange={(e) => {
-                  setCreatedDate(e.target.value);
-                }}
+                as="textarea"
+                placeholder="Enter house description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
               />
             </FloatingLabel>
           </Modal.Body>
@@ -71,8 +66,8 @@ const AddHouse = ({ save }) => {
             onClick={() => {
               save({
                 name,
-                owner,
-                created_date: createdDate, // Assuming createdDate is a string
+                address,
+                description,
               });
               handleClose();
             }}

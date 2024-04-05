@@ -7,7 +7,7 @@ import { Row } from "react-bootstrap";
 
 import { NotificationSuccess, NotificationError } from "../utils/Notifications";
 import {
-  getGuest as getGuestList,
+  getAllGuests as getGuestList,
   registerGuest,
   updateGuest
 } from "../../utils/guestService";
@@ -17,7 +17,7 @@ const Guests = () => {
   const [loading, setLoading] = useState(false);
 
   // Function to get the list of guests
-  const getGuest = useCallback(async () => {
+  const getGuests = useCallback(async () => {
     try {
       setLoading(true);
       setGuests(await getGuestList());
@@ -32,10 +32,8 @@ const Guests = () => {
   const addGuest = async (data) => {
     try {
       setLoading(true);
-      const idStr = data.id;
-      data.id = parseInt(idStr, 10);
       registerGuest(data).then((resp) => {
-        getGuest();
+        getGuests();
       });
       toast(<NotificationSuccess text="Guest added successfully." />);
     } catch (error) {
@@ -47,24 +45,10 @@ const Guests = () => {
   };
 
   // Function to update a guest
-  const update = async (data) => {
-    try {
-      setLoading(true);
-      data.id = parseInt(data.id, 10);
-      updateGuest(data).then((resp) => {
-        getGuest();
-        toast(<NotificationSuccess text="Guest updated successfully." />);
-      });
-    } catch (error) {
-      console.log({ error });
-      toast(<NotificationError text="Failed to update a guest." />);
-    } finally {
-      setLoading(false);
-    }
-  };
+
 
   useEffect(() => {
-    getGuest();
+    getGuests();
   }, []);
 
   return (
@@ -81,7 +65,8 @@ const Guests = () => {
                 guest={{
                   ..._guest,
                 }}
-                update={update}
+                key={_guest.id}
+                getGuests={getGuests}
               />
             ))}
           </Row>

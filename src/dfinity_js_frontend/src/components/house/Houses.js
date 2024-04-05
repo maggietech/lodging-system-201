@@ -7,7 +7,8 @@ import { Row } from "react-bootstrap";
 
 import { NotificationSuccess, NotificationError } from "../utils/Notifications";
 import {
-  getHouse as getHouseList,
+  
+  getHouses as getHouseList,
   registerHouse, updateHouse
 } from "../../utils/houseService";
 
@@ -17,7 +18,7 @@ const Houses = () => {
 
 
   // function to get the list of products
-  const getHouse = useCallback(async () => {
+  const getHouses = useCallback(async () => {
     try {
       setLoading(true);
       setHouses(await getHouseList());
@@ -31,10 +32,8 @@ const Houses = () => {
   const addHouse = async (data) => {
     try {
       setLoading(true);
-      const idStr = data.id;
-      data.id = parseInt(idStr, 10);
       registerHouse(data).then((resp) => {
-        getHouse();
+        getHouses();
       });
       toast(<NotificationSuccess text="House added successfully." />);
     } catch (error) {
@@ -45,24 +44,10 @@ const Houses = () => {
     }
   };
 
-  const update = async (data) => {
-    try {
-      setLoading(true);
-      data.id = parseInt(data.id, 10);
-      updateHouse(data).then((resp) => {
-        getHouse();
-        toast(<NotificationSuccess text="House added successfully." />);
-      });
-    } catch (error) {
-      console.log({ error });
-      toast(<NotificationError text="Failed to add a house." />);
-    } finally {
-      setLoading(false);
-    }
-  };
+
 
   useEffect(() => {
-    getHouse();
+    getHouses();
   }, []);
 
   return (
@@ -74,12 +59,13 @@ const Houses = () => {
             <AddHouse save={addHouse} />
           </div>
           <Row xs={1} sm={2} lg={3} className="g-3  mb-5 g-xl-4 g-xxl-5">
-            {houses.map((_houses) => (
+            {houses.map((_house) => (
               <House
                 house={{
                   ..._house,
                 }}
-                update={update}
+                key={_house.id}
+                getHouses={getHouses}
               />
             ))}
           </Row>

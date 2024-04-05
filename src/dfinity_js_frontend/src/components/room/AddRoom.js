@@ -3,13 +3,16 @@ import PropTypes from "prop-types";
 import { Button, Modal, Form, FloatingLabel } from "react-bootstrap";
 
 const AddRoom = ({ save }) => {
-  const [houseId, setHouseId] = useState("");
-  const [roomNumber, setRoomNumber] = useState("");
-  const [isBooked, setIsBooked] = useState(false);
-  const [price, setPrice] = useState("");
-  const [createdDate, setCreatedDate] = useState("");
 
-  const isFormFilled = () => houseId && roomNumber && price && createdDate;
+
+  const [house_id, setHouseId] = useState("");
+  const [room_number, setRoomNumber] = useState("");
+  const [capacity, setCapacity] = useState("");
+  const [price_per_night, setPricePerNight] = useState("");
+
+  const isFormFilled = () => house_id && room_number && capacity && price_per_night;
+
+
 
   const [show, setShow] = useState(false);
 
@@ -30,53 +33,36 @@ const AddRoom = ({ save }) => {
         </Modal.Header>
         <Form>
           <Modal.Body>
-            <FloatingLabel controlId="inputHouseId" label="House ID" className="mb-3">
+            <FloatingLabel controlId="house_id" label="House ID">
               <Form.Control
                 type="text"
-                placeholder="House ID"
-                onChange={(e) => {
-                  setHouseId(e.target.value);
-                }}
+                placeholder="Enter house ID"
+                value={house_id}
+                onChange={(e) => setHouseId(e.target.value)}
               />
             </FloatingLabel>
-            <FloatingLabel controlId="inputRoomNumber" label="Room Number" className="mb-3">
+            <FloatingLabel controlId="room_number" label="Room Number">
               <Form.Control
                 type="text"
-                placeholder="Room Number"
-                onChange={(e) => {
-                  setRoomNumber(e.target.value);
-                }}
+                placeholder="Enter room number"
+                value={room_number}
+                onChange={(e) => setRoomNumber(e.target.value)}
               />
             </FloatingLabel>
-            <Form.Check
-              type="checkbox"
-              id="checkbox-is-booked"
-              label="Is Booked"
-              className="mb-3"
-              onChange={(e) => {
-                setIsBooked(e.target.checked);
-              }}
-            />
-            <FloatingLabel controlId="inputPrice" label="Price" className="mb-3">
+            <FloatingLabel controlId="capacity" label="Capacity">
               <Form.Control
                 type="text"
-                placeholder="Price"
-                onChange={(e) => {
-                  setPrice(e.target.value);
-                }}
+                placeholder="Enter room capacity"
+                value={capacity}
+                onChange={(e) => setCapacity(e.target.value)}
               />
             </FloatingLabel>
-            <FloatingLabel
-              controlId="inputCreatedDate"
-              label="Created Date"
-              className="mb-3"
-            >
+            <FloatingLabel controlId="price_per_night" label="Price per night">
               <Form.Control
-                type="text" // Assuming createdDate is a string
-                placeholder="Created Date"
-                onChange={(e) => {
-                  setCreatedDate(e.target.value);
-                }}
+                type="text"
+                placeholder="Enter price per night"
+                value={price_per_night}
+                onChange={(e) => setPricePerNight(e.target.value)}
               />
             </FloatingLabel>
           </Modal.Body>
@@ -90,11 +76,10 @@ const AddRoom = ({ save }) => {
             disabled={!isFormFilled()}
             onClick={() => {
               save({
-                house_id: houseId,
-                room_number: roomNumber,
-                is_booked: isBooked,
-                price: price,
-                created_date: createdDate, // Assuming createdDate is a string
+                house_id,
+                room_number,
+                capacity,
+                price_per_night,
               });
               handleClose();
             }}

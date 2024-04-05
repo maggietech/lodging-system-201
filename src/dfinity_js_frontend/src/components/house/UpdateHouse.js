@@ -1,13 +1,39 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { Button, Modal, Form, FloatingLabel } from "react-bootstrap";
+import { updateHouse } from "../../utils/houseService";
+import { toast } from "react-toastify";
+import { NotificationSuccess, NotificationError } from "../utils/Notifications";
 
-const UpdateHouse = ({ house, save }) => {
+
+const UpdateHouse = ({ id, getHouses}) => {
   const [name, setName] = useState("");
-  const [owner, setOwner] = useState("");
-  const [createdDate, setCreatedDate] = useState("");
+  const [address, setAddress] = useState("");
+  const [description, setDescription] = useState("");
 
-  const isFormFilled = () => owner && createdDate;
+  const [loading, setLoading] = useState(false);
+
+  const update = async () => {
+    try {
+      setLoading(true);
+      const housePayload = {
+        name,
+        address,
+        description,
+      };
+      updateHouse(id,housePayload).then((resp) => {
+        getHouses();
+        toast(<NotificationSuccess text="House Updated successfully." />);
+      });
+    } catch (error) {
+      console.log({ error });
+      toast(<NotificationError text="Failed to Update a house." />);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const isFormFilled = () => name && address && description;
 
   const [show, setShow] = useState(false);
 
@@ -21,7 +47,7 @@ const UpdateHouse = ({ house, save }) => {
         onClick={handleShow}
         className="rounded-pill btn btn-outline-secondary"
       >
-        Update House <i className="bi ml-2 bi-plus"></i>
+        Update House 
       </button>
       <Modal show={show} onHide={handleClose} centered>
         <Modal.Header closeButton>
@@ -29,38 +55,28 @@ const UpdateHouse = ({ house, save }) => {
         </Modal.Header>
         <Form>
           <Modal.Body>
-            <FloatingLabel controlId="inputName" label="Name" className="mb-3">
+            <FloatingLabel controlId="name" label="Name">
               <Form.Control
                 type="text"
-                placeholder="Name"
-                defaultValue={house.name}
-                onChange={(e) => {
-                  setName(e.target.value);
-                }}
+                placeholder="Enter house name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
               />
             </FloatingLabel>
-            <FloatingLabel controlId="inputOwner" label="Owner" className="mb-3">
+            <FloatingLabel controlId="address" label="Address">
               <Form.Control
                 type="text"
-                placeholder="Owner"
-                defaultValue={house.owner}
-                onChange={(e) => {
-                  setOwner(e.target.value);
-                }}
+                placeholder="Enter house address"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
               />
             </FloatingLabel>
-            <FloatingLabel
-              controlId="inputCreatedDate"
-              label="Created Date"
-              className="mb-3"
-            >
+            <FloatingLabel controlId="description" label="Description">
               <Form.Control
-                type="text" // Assuming createdDate is a string
-                placeholder="Created Date"
-                defaultValue={house.created_date}
-                onChange={(e) => {
-                  setCreatedDate(e.target.value);
-                }}
+                as="textarea"
+                placeholder="Enter house description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
               />
             </FloatingLabel>
           </Modal.Body>
@@ -73,12 +89,7 @@ const UpdateHouse = ({ house, save }) => {
             variant="dark"
             disabled={!isFormFilled()}
             onClick={() => {
-              save({
-                id: house.id,
-                name,
-                owner,
-                created_date: createdDate, // Assuming createdDate is a string
-              });
+              update();
               handleClose();
             }}
           >
@@ -90,8 +101,6 @@ const UpdateHouse = ({ house, save }) => {
   );
 };
 
-UpdateHouse.propTypes = {
-  save: PropTypes.func.isRequired,
-};
+
 
 export default UpdateHouse;

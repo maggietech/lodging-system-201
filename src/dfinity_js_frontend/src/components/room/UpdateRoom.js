@@ -1,17 +1,46 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { Button, Modal, Form, FloatingLabel } from "react-bootstrap";
+import { updateRoom } from "../../utils/roomService";
+import { toast } from "react-toastify";
+import { NotificationError, NotificationSuccess } from "../utils/Notifications";
 
-const UpdateRoom = ({ room, save }) => {
-  const [roomNumber, setRoomNumber] = useState(room.room_number);
-  const [isBooked, setIsBooked] = useState(room.is_booked);
-  const [price, setPrice] = useState(room.price);
+
+const UpdateRoom = ({ id, getRooms }) => {
+  const [house_id, setHouseId] = useState("");
+  const [room_number, setRoomNumber] = useState("");
+  const [capacity, setCapacity] = useState("");
+  const [price_per_night, setPricePerNight] = useState("");
+
+  const isFormFilled = () => house_id && room_number && capacity && price_per_night;
+
+  const update = async () => {
+    try {
+      setLoading(true);
+      const roomPayload = {
+        house_id,
+        room_number,
+        capacity,
+        price_per_night,
+      };
+      
+      updateRoom(id,roomPayload).then((resp) => {
+        getRooms();
+        toast(<NotificationSuccess text="House Updated successfully." />);
+      });
+    } catch (error) {
+      console.log({ error });
+      toast(<NotificationError text="Failed to Update a house." />);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const [show, setShow] = useState(false);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
-  const isFormFilled = () => roomNumber && price;
 
   return (
     <>
@@ -19,7 +48,7 @@ const UpdateRoom = ({ room, save }) => {
         onClick={handleShow}
         className="rounded-pill btn btn-outline-secondary"
       >
-        Update Room <i className="bi ml-2 bi-plus"></i>
+        Update Room 
       </button>
       <Modal show={show} onHide={handleClose} centered>
         <Modal.Header closeButton>
@@ -27,28 +56,36 @@ const UpdateRoom = ({ room, save }) => {
         </Modal.Header>
         <Form>
           <Modal.Body>
-            <FloatingLabel controlId="inputRoomNumber" label="Room Number" className="mb-3">
+            <FloatingLabel controlId="house_id" label="House ID">
               <Form.Control
                 type="text"
-                placeholder="Room Number"
-                value={roomNumber}
+                placeholder="Enter house ID"
+                value={house_id}
+                onChange={(e) => setHouseId(e.target.value)}
+              />
+            </FloatingLabel>
+            <FloatingLabel controlId="room_number" label="Room Number">
+              <Form.Control
+                type="text"
+                placeholder="Enter room number"
+                value={room_number}
                 onChange={(e) => setRoomNumber(e.target.value)}
               />
             </FloatingLabel>
-            <Form.Check
-              type="checkbox"
-              id="isBookedCheckbox"
-              label="Is Booked"
-              checked={isBooked}
-              onChange={(e) => setIsBooked(e.target.checked)}
-              className="mb-3"
-            />
-            <FloatingLabel controlId="inputPrice" label="Price" className="mb-3">
+            <FloatingLabel controlId="capacity" label="Capacity">
               <Form.Control
                 type="text"
-                placeholder="Price"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
+                placeholder="Enter room capacity"
+                value={capacity}
+                onChange={(e) => setCapacity(e.target.value)}
+              />
+            </FloatingLabel>
+            <FloatingLabel controlId="price_per_night" label="Price per night">
+              <Form.Control
+                type="text"
+                placeholder="Enter price per night"
+                value={price_per_night}
+                onChange={(e) => setPricePerNight(e.target.value)}
               />
             </FloatingLabel>
           </Modal.Body>
@@ -61,12 +98,7 @@ const UpdateRoom = ({ room, save }) => {
             variant="dark"
             disabled={!isFormFilled()}
             onClick={() => {
-              save({
-                ...room,
-                room_number: roomNumber,
-                is_booked: isBooked,
-                price: price,
-              });
+              update();
               handleClose();
             }}
           >
@@ -78,9 +110,5 @@ const UpdateRoom = ({ room, save }) => {
   );
 };
 
-UpdateRoom.propTypes = {
-  room: PropTypes.object.isRequired,
-  save: PropTypes.func.isRequired,
-};
 
 export default UpdateRoom;

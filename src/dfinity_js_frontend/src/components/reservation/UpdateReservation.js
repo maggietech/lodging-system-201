@@ -1,16 +1,50 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { Button, Modal, Form, FloatingLabel } from "react-bootstrap";
+import { updateReservation } from "../../utils/reservationService";
+import { toast } from "react-toastify";
+import { NotificationError, NotificationSuccess } from "../utils/Notifications";
 
-const UpdateReservation = ({ reservation, save }) => {
-  const [checkInDate, setCheckInDate] = useState(reservation.check_in_date);
-  const [checkOutDate, setCheckOutDate] = useState(reservation.check_out_date);
+const UpdateReservation = ({ id, getReservations }) => {
+  
+
+  const [house_id, setHouseId] = useState("");
+  const [room_id, setRoomId] = useState("");
+  const [guest_id, setGuestId] = useState("");
+  const [check_in_date, setCheckInDate] = useState("");
+  const [check_out_date, setCheckOutDate] = useState("");
+
+  const [loading, setLoading] = useState(false);
+  const update = async () => {
+    try {
+      setLoading(true);
+      const data = {
+        house_id,
+        room_id,
+        guest_id,
+        check_in_date,
+        check_out_date,
+      };
+
+      updateReservation(id,data).then((resp) => {
+        getReservations();
+        toast(<NotificationSuccess text="Guest updated successfully." />);
+      });
+    } catch (error) {
+      console.log({ error });
+      toast(<NotificationError text="Failed to update a guest." />);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const isFormFilled = () => house_id && room_id && guest_id && check_in_date && check_out_date;
+
   const [show, setShow] = useState(false);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
-  const isFormFilled = () => checkInDate && checkOutDate;
 
   return (
     <>
@@ -26,19 +60,43 @@ const UpdateReservation = ({ reservation, save }) => {
         </Modal.Header>
         <Form>
           <Modal.Body>
-            <FloatingLabel controlId="inputCheckInDate" label="Check-In Date" className="mb-3">
+            <FloatingLabel controlId="house_id" label="House ID">
               <Form.Control
-                type="text" // Assuming checkInDate is a string
-                placeholder="Check-In Date"
-                value={checkInDate}
+                type="text"
+                placeholder="Enter house ID"
+                value={house_id}
+                onChange={(e) => setHouseId(e.target.value)}
+              />
+            </FloatingLabel>
+            <FloatingLabel controlId="room_id" label="Room ID">
+              <Form.Control
+                type="text"
+                placeholder="Enter room ID"
+                value={room_id}
+                onChange={(e) => setRoomId(e.target.value)}
+              />
+            </FloatingLabel>
+            <FloatingLabel controlId="guest_id" label="Guest ID">
+              <Form.Control
+                type="text"
+                placeholder="Enter guest ID"
+                value={guest_id}
+                onChange={(e) => setGuestId(e.target.value)}
+              />
+            </FloatingLabel>
+            <FloatingLabel controlId="check_in_date" label="Check-in Date">
+              <Form.Control
+                type="date"
+                placeholder="Enter check-in date"
+                value={check_in_date}
                 onChange={(e) => setCheckInDate(e.target.value)}
               />
             </FloatingLabel>
-            <FloatingLabel controlId="inputCheckOutDate" label="Check-Out Date" className="mb-3">
+            <FloatingLabel controlId="check_out_date" label="Check-out Date">
               <Form.Control
-                type="text" // Assuming checkOutDate is a string
-                placeholder="Check-Out Date"
-                value={checkOutDate}
+                type="date"
+                placeholder="Enter check-out date"
+                value={check_out_date}
                 onChange={(e) => setCheckOutDate(e.target.value)}
               />
             </FloatingLabel>
@@ -52,11 +110,7 @@ const UpdateReservation = ({ reservation, save }) => {
             variant="dark"
             disabled={!isFormFilled()}
             onClick={() => {
-              save({
-                ...reservation,
-                check_in_date: checkInDate,
-                check_out_date: checkOutDate,
-              });
+              update();
               handleClose();
             }}
           >
@@ -68,9 +122,6 @@ const UpdateReservation = ({ reservation, save }) => {
   );
 };
 
-UpdateReservation.propTypes = {
-  reservation: PropTypes.object.isRequired,
-  save: PropTypes.func.isRequired,
-};
+
 
 export default UpdateReservation;

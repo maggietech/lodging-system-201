@@ -21,9 +21,9 @@ const App = function AppWrapper() {
         <Container fluid="md">
           <main>
            <House />
+           <Room />
            <Guest />
            <Reservation />
-           <Room />
           </main>
         </Container>
        ) : (

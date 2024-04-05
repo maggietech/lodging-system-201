@@ -7,7 +7,7 @@ import { Row } from "react-bootstrap";
 
 import { NotificationSuccess, NotificationError } from "../utils/Notifications";
 import {
-  getRoom as getRoomList,
+  getRooms as getRoomList,
   registerRoom,
   updateRoom
 } from "../../utils/roomService";
@@ -17,7 +17,7 @@ const Rooms = () => {
   const [loading, setLoading] = useState(false);
 
   // Function to get the list of rooms
-  const getRoom = useCallback(async () => {
+  const getRooms = useCallback(async () => {
     try {
       setLoading(true);
       setRooms(await getRoomList());
@@ -32,10 +32,8 @@ const Rooms = () => {
   const addRoom = async (data) => {
     try {
       setLoading(true);
-      const idStr = data.id;
-      data.id = parseInt(idStr, 10);
       registerRoom(data).then((resp) => {
-        getRoomDetails();
+        getRooms();
       });
       toast(<NotificationSuccess text="Room added successfully." />);
     } catch (error) {
@@ -46,25 +44,10 @@ const Rooms = () => {
     }
   };
 
-  // Function to update a room
-  const update = async (data) => {
-    try {
-      setLoading(true);
-      data.id = parseInt(data.id, 10);
-      updateRoom(data).then((resp) => {
-        getRoom();
-        toast(<NotificationSuccess text="Room updated successfully." />);
-      });
-    } catch (error) {
-      console.log({ error });
-      toast(<NotificationError text="Failed to update a room." />);
-    } finally {
-      setLoading(false);
-    }
-  };
+
 
   useEffect(() => {
-    getRoom();
+    getRooms();
   }, []);
 
   return (
@@ -81,7 +64,9 @@ const Rooms = () => {
                 room={{
                   ..._room,
                 }}
-                update={update}
+                key={_room.id}
+                getRooms={getRooms}
+
               />
             ))}
           </Row>

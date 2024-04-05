@@ -2,46 +2,30 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Card, Col, Badge, Button } from "react-bootstrap";
 import UpdateReservation from "./UpdateReservation"; 
-const Reservation = ({ reservation, update }) => {
-  const { id, room_id, guest_id, check_in_date, check_out_date, created_date } = reservation;
+const Reservation = ({ reservation, getReservations }) => {
 
-  const triggerUpdate = () => {
-    // Handle update action here
-    update(id);
-  };
+  const { id, house_id, room_id, guest_id, check_in_date, check_out_date } = reservation;
+
 
   return (
-    <Col key={id}>
-      <Card className=" h-100">
+    <Col>
+      <Card>
         <Card.Header>
-          <Badge bg="secondary" className="me-2">
-            {room_id}
-          </Badge>
-          <Badge bg="info">{guest_id}</Badge>
+          <h5>Reservation ID: {id}</h5>
         </Card.Header>
-        <Card.Body className="d-flex flex-column text-center">
-          <Card.Text className="text-secondary">
-            Check-in: {new Date(check_in_date).toLocaleDateString()}
-          </Card.Text>
-          <Card.Text className="text-secondary">
-            Check-out: {new Date(check_out_date).toLocaleDateString()}
-          </Card.Text>
-          <Card.Text className="text-secondary">
-            <span>Created: {new Date(created_date).toLocaleDateString()}</span>
-          </Card.Text>
-          <Button variant="outline-dark" onClick={triggerUpdate} className="w-100 py-3">
-          <UpdateReservation reservation={reservation} save={update} />
-            Update
-          </Button>
+        <Card.Body>
+          <Card.Title>House ID: {house_id}</Card.Title>
+          <Card.Subtitle className="mb-2 text-muted">Room ID: {room_id}</Card.Subtitle>
+          <Card.Text>Guest ID: {guest_id}</Card.Text>
+          <Card.Text>Check-in Date: {check_in_date}</Card.Text>
+          <Card.Text>Check-out Date: {check_out_date}</Card.Text>
+          <UpdateReservation id={id} getReservations={getReservations} />
         </Card.Body>
       </Card>
     </Col>
   );
 };
 
-Reservation.propTypes = {
-  reservation: PropTypes.instanceOf(Object).isRequired,
-  update: PropTypes.func.isRequired,
-};
+
 
 export default Reservation;

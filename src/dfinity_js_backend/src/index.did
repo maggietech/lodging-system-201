@@ -1,14 +1,26 @@
 service: () -> {
-    addGuest: (record {name:text}) -> (text);
-    addHouse: (record {owner:principal; name:text}) -> (text);
-    addRoom: (record {is_booked:bool; house_id:text; room_number:text; price:text}) -> (text);
-    createReservation: (record {room_id:text; check_out_date:text; check_in_date:text; guest_id:text}) -> (text);
-    getGuest: (text) -> (variant {Ok:record {id:text; name:text; created_date:nat64}; Err:variant {NotFound:text}}) query;
-    getHouse: (text) -> (variant {Ok:record {id:text; updated_at:opt nat64; owner:principal; name:text; created_date:nat64}; Err:variant {NotFound:text}}) query;
-    getReservation: (text) -> (variant {Ok:record {id:text; room_id:text; check_out_date:text; check_in_date:text; created_date:nat64; guest_id:text}; Err:variant {NotFound:text}}) query;
-    getRoom: (text) -> (variant {Ok:record {id:text; is_booked:bool; updated_at:opt nat64; house_id:text; room_number:text; price:text; created_date:nat64}; Err:variant {NotFound:text}}) query;
-    updateGuest: (record {id:text; name:text; created_date:nat64}) -> (text);
-    updateHouse: (record {id:text; updated_at:opt nat64; owner:principal; name:text; created_date:nat64}) -> (text);
-    updateReservation: (record {id:text; room_id:text; check_out_date:text; check_in_date:text; created_date:nat64; guest_id:text}) -> (text);
-    updateRoom: (record {id:text; is_booked:bool; updated_at:opt nat64; house_id:text; room_number:text; price:text; created_date:nat64}) -> (text);
+    createGuest: (record {name:text; email:text; phone:text}) -> (variant {Ok:record {id:text; name:text; email:text; phone:text}; Err:variant {PaymentFailed:text; InvalidPayload:text; NotFound:text; PaymentCompleted:text}});
+    createHouse: (record {name:text; description:text; address:text}) -> (variant {Ok:record {id:text; name:text; description:text; address:text}; Err:variant {PaymentFailed:text; InvalidPayload:text; NotFound:text; PaymentCompleted:text}});
+    createReservation: (record {room_id:text; check_out_date:text; check_in_date:text; house_id:text; guest_id:text}) -> (variant {Ok:record {id:text; room_id:text; check_out_date:text; check_in_date:text; house_id:text; guest_id:text}; Err:variant {PaymentFailed:text; InvalidPayload:text; NotFound:text; PaymentCompleted:text}});
+    createRoom: (record {price_per_night:text; house_id:text; room_number:text; capacity:text}) -> (variant {Ok:record {id:text; is_booked:bool; price_per_night:text; house_id:text; room_number:text; capacity:text}; Err:variant {PaymentFailed:text; InvalidPayload:text; NotFound:text; PaymentCompleted:text}});
+    getGuest: (text) -> (variant {Ok:record {id:text; name:text; email:text; phone:text}; Err:variant {PaymentFailed:text; InvalidPayload:text; NotFound:text; PaymentCompleted:text}}) query;
+    getGuests: () -> (vec record {id:text; name:text; email:text; phone:text}) query;
+    getHouse: (text) -> (variant {Ok:record {id:text; name:text; description:text; address:text}; Err:variant {PaymentFailed:text; InvalidPayload:text; NotFound:text; PaymentCompleted:text}}) query;
+    getHouses: () -> (vec record {id:text; name:text; description:text; address:text}) query;
+    getReservation: (text) -> (variant {Ok:record {id:text; room_id:text; check_out_date:text; check_in_date:text; house_id:text; guest_id:text}; Err:variant {PaymentFailed:text; InvalidPayload:text; NotFound:text; PaymentCompleted:text}}) query;
+    getReservations: () -> (vec record {id:text; room_id:text; check_out_date:text; check_in_date:text; house_id:text; guest_id:text}) query;
+    getReservationsByCheckInDate: (text) -> (vec record {id:text; room_id:text; check_out_date:text; check_in_date:text; house_id:text; guest_id:text}) query;
+    getReservationsByCheckOutDate: (text) -> (vec record {id:text; room_id:text; check_out_date:text; check_in_date:text; house_id:text; guest_id:text}) query;
+    getReservationsByGuestId: (text) -> (vec record {id:text; room_id:text; check_out_date:text; check_in_date:text; house_id:text; guest_id:text}) query;
+    getReservationsByHouseId: (text) -> (vec record {id:text; room_id:text; check_out_date:text; check_in_date:text; house_id:text; guest_id:text}) query;
+    getReservationsByHouseIdAndCheckInDate: (text, text) -> (vec record {id:text; room_id:text; check_out_date:text; check_in_date:text; house_id:text; guest_id:text}) query;
+    getReservationsByHouseIdAndCheckOutDate: (text, text) -> (vec record {id:text; room_id:text; check_out_date:text; check_in_date:text; house_id:text; guest_id:text}) query;
+    getReservationsByRoomId: (text) -> (vec record {id:text; room_id:text; check_out_date:text; check_in_date:text; house_id:text; guest_id:text}) query;
+    getRoom: (text) -> (variant {Ok:record {id:text; is_booked:bool; price_per_night:text; house_id:text; room_number:text; capacity:text}; Err:variant {PaymentFailed:text; InvalidPayload:text; NotFound:text; PaymentCompleted:text}}) query;
+    getRooms: () -> (vec record {id:text; is_booked:bool; price_per_night:text; house_id:text; room_number:text; capacity:text}) query;
+    searchHouse: (text) -> (vec record {id:text; name:text; description:text; address:text}) query;
+    updateGuest: (text, record {name:text; email:text; phone:text}) -> (variant {Ok:record {id:text; name:text; email:text; phone:text}; Err:variant {PaymentFailed:text; InvalidPayload:text; NotFound:text; PaymentCompleted:text}});
+    updateHouse: (text, record {name:text; description:text; address:text}) -> (variant {Ok:record {id:text; name:text; description:text; address:text}; Err:variant {PaymentFailed:text; InvalidPayload:text; NotFound:text; PaymentCompleted:text}});
+    updateReservation: (text, record {room_id:text; check_out_date:text; check_in_date:text; house_id:text; guest_id:text}) -> (variant {Ok:record {id:text; room_id:text; check_out_date:text; check_in_date:text; house_id:text; guest_id:text}; Err:variant {PaymentFailed:text; InvalidPayload:text; NotFound:text; PaymentCompleted:text}});
+    updateRoom: (text, record {price_per_night:text; house_id:text; room_number:text; capacity:text}) -> (variant {Ok:record {id:text; is_booked:bool; price_per_night:text; house_id:text; room_number:text; capacity:text}; Err:variant {PaymentFailed:text; InvalidPayload:text; NotFound:text; PaymentCompleted:text}});
 }

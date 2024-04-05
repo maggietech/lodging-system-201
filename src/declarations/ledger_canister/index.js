@@ -10,8 +10,7 @@ export { idlFactory } from "./ledger_canister.did.js";
  * beginning in dfx 0.15.0
  */
 export const canisterId =
-  process.env.CANISTER_ID_LEDGER_CANISTER ||
-  process.env.LEDGER_CANISTER_CANISTER_ID;
+  process.env.CANISTER_ID_LEDGER_CANISTER;
 
 export const createActor = (canisterId, options = {}) => {
   const agent = options.agent || new HttpAgent({ ...options.agentOptions });

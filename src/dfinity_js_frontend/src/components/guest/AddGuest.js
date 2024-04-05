@@ -3,10 +3,13 @@ import PropTypes from "prop-types";
 import { Button, Modal, Form, FloatingLabel } from "react-bootstrap";
 
 const AddGuest = ({ save }) => {
-  const [name, setName] = useState("");
-  const [createdDate, setCreatedDate] = useState("");
 
-  const isFormFilled = () => name && createdDate;
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+
+  const isFormFilled = () => name && email && phone;
 
   const [show, setShow] = useState(false);
 
@@ -27,26 +30,28 @@ const AddGuest = ({ save }) => {
         </Modal.Header>
         <Form>
           <Modal.Body>
-            <FloatingLabel controlId="inputName" label="Name" className="mb-3">
+            <FloatingLabel controlId="name" label="Name">
               <Form.Control
                 type="text"
-                placeholder="Name"
-                onChange={(e) => {
-                  setName(e.target.value);
-                }}
+                placeholder="Enter name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
               />
             </FloatingLabel>
-            <FloatingLabel
-              controlId="inputCreatedDate"
-              label="Created Date"
-              className="mb-3"
-            >
+            <FloatingLabel controlId="email" label="Email">
               <Form.Control
-                type="text" // Assuming createdDate is a string
-                placeholder="Created Date"
-                onChange={(e) => {
-                  setCreatedDate(e.target.value);
-                }}
+                type="text"
+                placeholder="Enter email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </FloatingLabel>
+            <FloatingLabel controlId="phone" label="Phone">
+              <Form.Control
+                type="text"
+                placeholder="Enter phone"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
               />
             </FloatingLabel>
           </Modal.Body>
@@ -61,7 +66,8 @@ const AddGuest = ({ save }) => {
             onClick={() => {
               save({
                 name,
-                created_date: createdDate, // Assuming createdDate is a string
+                email,
+                phone,
               });
               handleClose();
             }}

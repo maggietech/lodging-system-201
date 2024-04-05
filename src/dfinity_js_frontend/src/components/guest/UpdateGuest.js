@@ -1,15 +1,46 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { Button, Modal, Form, FloatingLabel } from "react-bootstrap";
+import { updateGuest } from "../../utils/guestService";
+import { toast } from "react-toastify";
+import { NotificationError, NotificationSuccess } from "../utils/Notifications";
 
-const UpdateGuest = ({ guest, save }) => {
-  const [name, setName] = useState(guest.name);
+
+
+const UpdateGuest = ({ id, getGuests }) => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+
+  const [loading, setLoading] = useState(false);
+  const isFormFilled = () => name && email && phone;
+
   const [show, setShow] = useState(false);
+
+  const update = async () => {
+    try {
+      setLoading(true);
+      const data = {
+        name,
+        email,
+        phone,
+      };
+
+      updateGuest(id,data).then((resp) => {
+        getGuests();
+        toast(<NotificationSuccess text="Guest updated successfully." />);
+      });
+    } catch (error) {
+      console.log({ error });
+      toast(<NotificationError text="Failed to update a guest." />);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
-  const isFormFilled = () => name;
 
   return (
     <>
@@ -17,7 +48,7 @@ const UpdateGuest = ({ guest, save }) => {
         onClick={handleShow}
         className="rounded-pill btn btn-outline-secondary"
       >
-        Update Guest <i className="bi ml-2 bi-plus"></i>
+        Update Guest 
       </button>
       <Modal show={show} onHide={handleClose} centered>
         <Modal.Header closeButton>
@@ -25,12 +56,28 @@ const UpdateGuest = ({ guest, save }) => {
         </Modal.Header>
         <Form>
           <Modal.Body>
-            <FloatingLabel controlId="inputName" label="Name" className="mb-3">
+            <FloatingLabel controlId="name" label="Name">
               <Form.Control
                 type="text"
-                placeholder="Name"
+                placeholder="Enter name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+              />
+            </FloatingLabel>
+            <FloatingLabel controlId="email" label="Email">
+              <Form.Control
+                type="text"
+                placeholder="Enter email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </FloatingLabel>
+            <FloatingLabel controlId="phone" label="Phone">
+              <Form.Control
+                type="text"
+                placeholder="Enter phone"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
               />
             </FloatingLabel>
           </Modal.Body>
@@ -43,10 +90,7 @@ const UpdateGuest = ({ guest, save }) => {
             variant="dark"
             disabled={!isFormFilled()}
             onClick={() => {
-              save({
-                ...guest,
-                name: name,
-              });
+              update();
               handleClose();
             }}
           >
@@ -58,9 +102,6 @@ const UpdateGuest = ({ guest, save }) => {
   );
 };
 
-UpdateGuest.propTypes = {
-  guest: PropTypes.object.isRequired,
-  save: PropTypes.func.isRequired,
-};
+
 
 export default UpdateGuest;
